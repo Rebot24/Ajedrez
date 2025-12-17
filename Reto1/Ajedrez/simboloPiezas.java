@@ -9,5 +9,5 @@ public class simboloPiezas {
     public static final char peonNegro= '\u2659';
 
     public static final char reyBlanco = '\u265A';
-    public static final char damaBlanco= '\u265B';
+    public static final char damaBlanca= '\u265B';
 }
