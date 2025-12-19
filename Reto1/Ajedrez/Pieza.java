@@ -1,36 +1,12 @@
 package Clase.Reto1.Ajedrez;
 
 public class Pieza {
-    private Tipo tipo;
-    private Color color;
-    private int posx;
-    private int posy;
+    Tipo tipo;
+    Color color;
 
-    public Pieza(char letra, char letrax, char letray, String color) {
-        switch (letra) {
-            case 'P': tipo = Tipo.PEON; break;
-            case 'A': tipo = Tipo.ALFIL; break;
-            case 'R': tipo = Tipo.REY; break;
-            case 'C': tipo = Tipo.CABALLO; break;
-            case 'T': tipo = Tipo.TORRE; break;
-            case 'Q': tipo = Tipo.REINA; break;
-        }
-
-        posx = letrax - 'a';
-        posy = letray - 'a';
-
-        if (color.equals("BLANCO")) this.color = Color.BLANCO;
-        else this.color = Color.NEGRO;
-    }
-
-    public Pieza(char letrax, char letray, String color) {
-        tipo = Tipo.PEON;
-
-        posx = letrax - 'a';
-        posy = letray - 'a';
-
-        if (color.equals("BLANCO")) this.color = Color.BLANCO;
-        else this.color = Color.NEGRO;
+    public Pieza(Tipo tipo, Color color) {
+        this.tipo = tipo;
+        this.color = color;
     }
 
     public boolean movimiento(char letrax, char letray) {
