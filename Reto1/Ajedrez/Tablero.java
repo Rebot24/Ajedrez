@@ -32,9 +32,10 @@ public class Tablero {
         }
     }
 
-    public boolean colocarPieza(Pieza pieza, String posicion) {
-        int fila = 8 - Character.getNumericValue(posicion.charAt(1));
-        int columna = posicion.charAt(0) - 'a';
+
+    public boolean colocarPieza(Pieza pieza, char letra, int num) {
+        int fila = letra - 'a';
+        int columna = 8 - num;
 
         if (!dentro(fila, columna)) return  false;
 
@@ -57,9 +58,28 @@ public class Tablero {
 
         if (tablero[f2][c2] != null && tablero[f2][c2].color == p.color) return false;
 
+        if (!comprobarMovimiento(tablero[f1][c1], f1, c1, f2, c2)) return false;
+
        tablero[f2][c2] = p;
        tablero[f1][c1] = null;
        return true;
+    }
+
+    public boolean comprobarMovimiento(Pieza pieza, int f1, int c1, int f2, int c2) {
+        int dx = Math.abs(f1 - f2);
+        int dy = Math.abs(c1 - c2);
+
+        switch (pieza.tipo) {
+            case PEON: return (dx == 0 && dy == 1);
+            case TORRE: return ((dx == 0 && dy != 0)||(dx != 0 && dy == 0));
+            case ALFIL: return (dx == dy);
+            case CABALLO: return ((dx == 2 && dy == 1) || (dx == 1 && dy == 2));
+            case DAMA: return ((dx == 0 && dy != 0)||(dx != 0 && dy == 0) || (dx == dy));
+            case REY: return ((dx == dy) || (dx == 0 && dy == 1) || (dx == 1 && dy == 0));
+            default: return false;
+        }
+
+       
     }
 
     public boolean dentro (int f, int c) {
@@ -75,14 +95,16 @@ public class Tablero {
                 String texto = esBlanca ? TEXTO_NEGRO : TEXTO_BLANCO;
 
                 if (tablero[fila][columna] == null) {
-                    System.out.print(fondo + texto + " " + RESET);
+
+                    System.out.print(fondo + texto + "   " + RESET);
                 } else {
                     char s = simbolo(tablero[fila][columna]);
-                    System.out.print(fondo + texto + " " + s + " " + RESET);
+                    System.out.print(fondo + texto + "   " + s + "   " + RESET);
+
                 }
             }
             System.out.println();
         }
-        System.out.println(" a b c d e f g h");
+        System.out.println("   a  b  c  d  e  f  g  h");
     }
 }
