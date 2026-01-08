@@ -32,6 +32,7 @@ public class Tablero {
         }
     }
 
+
     public boolean colocarPieza(Pieza pieza, char letra, int num) {
         int fila = letra - 'a';
         int columna = 8 - num;
@@ -77,6 +78,8 @@ public class Tablero {
             case REY: return ((dx == dy) || (dx == 0 && dy == 1) || (dx == 1 && dy == 0));
             default: return false;
         }
+
+       
     }
 
     public boolean dentro (int f, int c) {
@@ -92,10 +95,12 @@ public class Tablero {
                 String texto = esBlanca ? TEXTO_NEGRO : TEXTO_BLANCO;
 
                 if (tablero[fila][columna] == null) {
+
                     System.out.print(fondo + texto + "   " + RESET);
                 } else {
                     char s = simbolo(tablero[fila][columna]);
                     System.out.print(fondo + texto + "   " + s + "   " + RESET);
+
                 }
             }
             System.out.println();
