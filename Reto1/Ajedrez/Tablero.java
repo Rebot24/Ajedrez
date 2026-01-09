@@ -33,8 +33,8 @@ public class Tablero {
     }
 
     public boolean colocarPieza(Pieza pieza, char letra, int num) {
-        int fila = letra - 'a';
-        int columna = 8 - num;
+        int columna = letra - 'a';
+        int fila = 8 - num;
 
         if (!dentro(fila, columna)) return  false;
 
