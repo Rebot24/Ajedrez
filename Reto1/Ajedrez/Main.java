@@ -1,8 +1,5 @@
 package Clase.Reto1.Ajedrez;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
-import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
@@ -11,27 +8,32 @@ public class Main {
         Tablero tablero = new Tablero();
         System.out.println("Escribe la posición inicial de las piezas blancas separadas por espacios: ");
         String piezas = scan.nextLine();
-        pedirpiezas(tablero, piezas, Color.BLANCO);
+        if (pedirpiezas(tablero, piezas, Color.BLANCO)){
+            System.out.println("Escribe la posición inicial de las piezas negras separadas por espacios: ");
+            String piezas2 = scan.nextLine();
+            if (pedirpiezas(tablero, piezas2, Color.NEGRO)){
+                tablero.mostrar();
+            }
+        }
 
-        System.out.println("Escribe la posición inicial de las piezas negras separadas por espacios: ");
-        String piezas2 = scan.nextLine();
-        pedirpiezas(tablero, piezas2, Color.NEGRO);
-        tablero.mostrar();
 
         System.out.println("Gracias a Juan por su aportación!!! ;)");
     }
 
-    public static void crearpieza(Tablero tablero, Tipo tipo, Color color, char letra, int num) {
+    public static boolean crearpieza(Tablero tablero, Tipo tipo, Color color, char letra, int num, boolean isTrue) {
         Pieza p1 = new Pieza(tipo, color);
 
         System.out.println(p1.toString());
 
         if (!tablero.colocarPieza(p1, letra, num)){
             System.out.println("Posición incorrecta, no se han podido colocar las piezas.");
+            isTrue = false;
         }
+        return isTrue;
     }
-    public static void pedirpiezas(Tablero tablero, String entrada, Color color) {
+    public static boolean pedirpiezas(Tablero tablero, String entrada, Color color) {
         String[] posiciones = entrada.split(" ");
+        boolean isTrue = true;
 
         for (String pos : posiciones) {
             pos = pos.trim();
@@ -51,14 +53,17 @@ public class Main {
                 fila = Character.getNumericValue(pos.charAt(1));
             }
 
-            switch (pieza) {
-                case 'R' -> crearpieza(tablero, Tipo.REY, color, columna, fila);
-                case 'D' -> crearpieza(tablero, Tipo.DAMA, color, columna, fila);
-                case 'T' -> crearpieza(tablero, Tipo.TORRE, color, columna, fila);
-                case 'C' -> crearpieza(tablero, Tipo.CABALLO, color, columna, fila);
-                case 'A' -> crearpieza(tablero, Tipo.ALFIL, color, columna, fila);
-                case '0' -> crearpieza(tablero, Tipo.PEON, color, columna, fila);
+            if (isTrue) {
+                switch (pieza) {
+                    case 'R' -> isTrue = crearpieza(tablero, Tipo.REY, color, columna, fila, isTrue);
+                    case 'D' -> isTrue = crearpieza(tablero, Tipo.DAMA, color, columna, fila, isTrue);
+                    case 'T' -> isTrue = crearpieza(tablero, Tipo.TORRE, color, columna, fila, isTrue);
+                    case 'C' -> isTrue = crearpieza(tablero, Tipo.CABALLO, color, columna, fila, isTrue);
+                    case 'A' -> isTrue = crearpieza(tablero, Tipo.ALFIL, color, columna, fila, isTrue);
+                    default -> isTrue = crearpieza(tablero, Tipo.PEON, color, columna, fila, isTrue);
+                }
             }
+
 
             System.out.println("Posición: " + pos);
             if (pieza != 0) {
@@ -70,5 +75,6 @@ public class Main {
             System.out.println("  Fila: " + fila);
             System.out.println(color);
         }
+        return isTrue;
     }
 }
