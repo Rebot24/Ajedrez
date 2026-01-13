@@ -1,55 +1,38 @@
 package Clase.Reto1.Ajedrez;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
-import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
+        Tablero tablero = new Tablero();
         System.out.println("Escribe la posición inicial de las piezas blancas separadas por espacios: ");
         String piezas = scan.nextLine();
-        pedirpiezas(piezas, Color.BLANCO);
-
-        System.out.println("Escribe la posición inicial de las piezas negras separadas por espacios: ");
-        String piezas2 = scan.nextLine();
-        pedirpiezas(piezas2, Color.NEGRO);
-        Tablero tablero = new Tablero();
-        tablero.mostrar();
+        if (pedirpiezas(tablero, piezas, Color.BLANCO)){
+            System.out.println("Escribe la posición inicial de las piezas negras separadas por espacios: ");
+            String piezas2 = scan.nextLine();
+            if (pedirpiezas(tablero, piezas2, Color.NEGRO)){
+                tablero.mostrar();
+            }
+        }
 
         System.out.println("Gracias a Juan por su aportación!!! ;)");
     }
 
-    public static Tipo tipo(String str1) {
-        String pieza = "";
-
-        if (str1.length() > 2) {
-            pieza = str1.substring(0, 1);
-        } else if (str1.length() == 2) {
-            pieza = str1;
-        }
-        pieza = pieza.toUpperCase();
-        String valor = "";
-        switch (pieza) {
-            case "T" -> valor = "TORRE";
-            case "A" -> valor = "ALFIL";
-            case "R" -> valor = "REY";
-            case "D" -> valor = "DAMA";
-            case "C" -> valor = "CABALLO";
-            case "P" -> valor = "PEON";
-            default -> valor = "PEON";
-        }
-        return Tipo.valueOf(valor);
-    }
-
-    public static void crearpieza(Tipo tipo, Color color) {
-
+    public static boolean crearpieza(Tablero tablero, Tipo tipo, Color color, char letra, int num, boolean isTrue) {
         Pieza p1 = new Pieza(tipo, color);
+
         System.out.println(p1.toString());
+
+        if (!tablero.colocarPieza(p1, letra, num)){
+            System.out.println("Posición incorrecta, no se han podido colocar las piezas.");
+            isTrue = false;
+        }
+        return isTrue;
     }
-    public static void pedirpiezas(String entrada, Color color) {
+    public static boolean pedirpiezas(Tablero tablero, String entrada, Color color) {
         String[] posiciones = entrada.split(" ");
+        boolean isTrue = true;
 
         for (String pos : posiciones) {
             pos = pos.trim();
@@ -69,13 +52,15 @@ public class Main {
                 fila = Character.getNumericValue(pos.charAt(1));
             }
 
-            switch (pieza) {
-                case 'R' -> crearpieza(Tipo.REY, color);
-                case 'D' -> crearpieza(Tipo.DAMA, color);
-                case 'T' -> crearpieza(Tipo.TORRE, color);
-                case 'C' -> crearpieza(Tipo.CABALLO, color);
-                case 'A' -> crearpieza(Tipo.ALFIL, color);
-                case '0' -> crearpieza(Tipo.PEON, color);
+            if (isTrue) {
+                switch (pieza) {
+                    case 'R' -> isTrue = crearpieza(tablero, Tipo.REY, color, columna, fila, isTrue);
+                    case 'D' -> isTrue = crearpieza(tablero, Tipo.DAMA, color, columna, fila, isTrue);
+                    case 'T' -> isTrue = crearpieza(tablero, Tipo.TORRE, color, columna, fila, isTrue);
+                    case 'C' -> isTrue = crearpieza(tablero, Tipo.CABALLO, color, columna, fila, isTrue);
+                    case 'A' -> isTrue = crearpieza(tablero, Tipo.ALFIL, color, columna, fila, isTrue);
+                    default -> isTrue = crearpieza(tablero, Tipo.PEON, color, columna, fila, isTrue);
+                }
             }
 
             System.out.println("Posición: " + pos);
@@ -88,5 +73,6 @@ public class Main {
             System.out.println("  Fila: " + fila);
             System.out.println(color);
         }
+        return isTrue;
     }
 }
