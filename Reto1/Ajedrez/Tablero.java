@@ -102,4 +102,68 @@ public class Tablero {
         }
         System.out.println("   a  b  c  d  e  f  g  h");
     }
+
+    /*
+    // devuelve la pieza en una posición o null si esta vacía
+    public Pieza obtenerPieza(String posicion) {
+        int[] coord = convertirPosicion(posicion);
+        int fila = coord[0];
+        int columna = coord[1];
+
+        if (!dentro(fila, columna)) {
+            return null;
+        }
+
+        return tablero[fila][columna];
+    }
+
+    // vaciar tablero
+    public void limpiar() {
+        for (int f = 0; f < 8; f++) {
+            for (int c = 0; c < 8; c++) {
+                tablero[f][c] = null;
+            }
+        }
+    }
+
+    //existe el rey del color
+
+    public boolean hayRey(Color color) {
+        for (int f = 0; f < 8; f++) {
+            for (int c = 0; c < 8; c++) {
+                Pieza p = tablero[f][c];
+                if (p != null) {
+                    if (p.tipo == Tipo.REY && p.color == color) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    //compruebat si la composición minima del tablero es válida
+    // un rey blanco y uno negro
+    public boolean composicionMinimaValida() {
+        boolean reyBlanco = false;
+        boolean reyNegro = false;
+
+        for (int f = 0; f < 8; f++) {
+            for (int c = 0; c < 8; c++) {
+                Pieza p = tablero[f][c];
+                if (p != null && p.tipo == Tipo.REY) {
+                    if (p.color == Color.BLANCO) {
+                        if (reyBlanco) return false;
+                        reyBlanco = true;
+                    } else {
+                        if (reyNegro) return false;
+                        reyNegro = true;
+                    }
+                }
+            }
+        }
+
+        return reyBlanco && reyNegro;
+    }
+    */
 }
