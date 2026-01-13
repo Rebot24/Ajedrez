@@ -1,80 +1,95 @@
-package Clase.Reto1.Ajedrez;
 
+import java.awt.*;
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
+
         Scanner scan = new Scanner(System.in);
         Tablero tablero = new Tablero();
-        System.out.println("Escribe la posición inicial de las piezas blancas separadas por espacios: ");
-        String piezas = scan.nextLine();
-        if (pedirpiezas(tablero, piezas, Color.BLANCO)){
-            System.out.println("Escribe la posición inicial de las piezas negras separadas por espacios: ");
-            String piezas2 = scan.nextLine();
-            if (pedirpiezas(tablero, piezas2, Color.NEGRO)){
-                tablero.mostrar();
+        boolean posicionValida = false;
+
+        while (!posicionValida) {
+
+            tablero.limpiar();
+
+            System.out.println("Escribe la posición inicial de las piezas BLANCAS separadas por espacios:");
+            String piezasBlancas = scan.nextLine().toUpperCase();
+
+            System.out.println("Escribe la posición inicial de las piezas NEGRAS separadas por espacios:");
+            String piezasNegras = scan.nextLine().toUpperCase();
+
+            boolean blancasOk = pedirpiezas(tablero, piezasBlancas, Color.BLANCO);
+            boolean negrasOk = pedirpiezas(tablero, piezasNegras, Color.NEGRO);
+
+            if (!blancasOk || !negrasOk) {
+                System.out.println("Error en la entrada. Vuelve a introducir las piezas.\n");
+                continue;
             }
+
+            if (!tablero.composicionMinimaValida()) {
+                System.out.println("Composición inválida: debe haber un rey blanco y uno negro.\n");
+                continue;
+            }
+
+            posicionValida = true;
         }
 
-
-        System.out.println("Gracias a Juan por su aportación!!! ;)");
+        System.out.println("Posición inicial correcta:");
+        tablero.mostrar();
     }
 
-    public static boolean crearpieza(Tablero tablero, Tipo tipo, Color color, char letra, int num, boolean isTrue) {
-        Pieza p1 = new Pieza(tipo, color);
 
-        System.out.println(p1.toString());
-
-        if (!tablero.colocarPieza(p1, letra, num)){
-            System.out.println("Posición incorrecta, no se han podido colocar las piezas.");
-            isTrue = false;
-        }
-        return isTrue;
-    }
+    //El Tablero se crea, pero no recibe ninguna pieza
+    // crearpieza( crea objetos que se pierden y no sirven para nada
     public static boolean pedirpiezas(Tablero tablero, String entrada, Color color) {
+
+        if (entrada == null || entrada.isEmpty()) {
+            return true;
+        }
+
         String[] posiciones = entrada.split(" ");
-        boolean isTrue = true;
 
         for (String pos : posiciones) {
-            pos = pos.trim();
 
-            char pieza = 0;
-            char columna;
-            int fila;
+            pos = pos.trim();
+            if (pos.length() < 2) {
+                return false;
+            }
+
+            char letraPieza;
+            String casilla;
 
             if (Character.isUpperCase(pos.charAt(0))) {
-                // Tiene pieza (ej: Cb1)
-                pieza = pos.charAt(0);
-                columna = pos.charAt(1);
-                fila = Character.getNumericValue(pos.charAt(2));
+                letraPieza = pos.charAt(0);
+                casilla = pos.substring(1);
             } else {
-                // No tiene pieza (ej: g3)
-                columna = pos.charAt(0);
-                fila = Character.getNumericValue(pos.charAt(1));
+                letraPieza = 'P';
+                casilla = pos;
             }
 
-            if (isTrue) {
-                switch (pieza) {
-                    case 'R' -> isTrue = crearpieza(tablero, Tipo.REY, color, columna, fila, isTrue);
-                    case 'D' -> isTrue = crearpieza(tablero, Tipo.DAMA, color, columna, fila, isTrue);
-                    case 'T' -> isTrue = crearpieza(tablero, Tipo.TORRE, color, columna, fila, isTrue);
-                    case 'C' -> isTrue = crearpieza(tablero, Tipo.CABALLO, color, columna, fila, isTrue);
-                    case 'A' -> isTrue = crearpieza(tablero, Tipo.ALFIL, color, columna, fila, isTrue);
-                    default -> isTrue = crearpieza(tablero, Tipo.PEON, color, columna, fila, isTrue);
-                }
+            Tipo tipo = switch (letraPieza) {
+                case 'R' -> Tipo.REY;
+                case 'D' -> Tipo.DAMA;
+                case 'T' -> Tipo.TORRE;
+                case 'C' -> Tipo.CABALLO;
+                case 'A' -> Tipo.ALFIL;
+                case 'P' -> Tipo.PEON;
+                default -> null;
+            };
+
+            if (tipo == null) {
+                return false;
             }
 
+            Pieza pieza = new Pieza(tipo, color);
 
-            System.out.println("Posición: " + pos);
-            if (pieza != 0) {
-                System.out.println("  Pieza: " + pieza);
-            } else {
-                System.out.println("  Pieza: Peón");
+            if (!tablero.colocarPieza(pieza, casilla)) {
+                return false;
             }
-            System.out.println("  Columna: " + columna);
-            System.out.println("  Fila: " + fila);
-            System.out.println(color);
         }
-        return isTrue;
+
+        return true;
     }
 }
