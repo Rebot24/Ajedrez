@@ -1,92 +1,155 @@
 package Clase.Reto1.Ajedrez;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
-import java.util.ArrayList;
-import java.util.Locale;
+import java.awt.*;
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
+
         Scanner scan = new Scanner(System.in);
-        System.out.println("Escribe la posición inicial de las piezas blancas separadas por espacios: ");
-        String piezas = scan.nextLine();
-        pedirpiezas(piezas, Color.BLANCO);
-
-        System.out.println("Escribe la posición inicial de las piezas negras separadas por espacios: ");
-        String piezas2 = scan.nextLine();
-        pedirpiezas(piezas2, Color.NEGRO);
         Tablero tablero = new Tablero();
-        tablero.mostrar();
+        boolean posicionValida = false;
 
-        System.out.println("Gracias a Juan por su aportación!!! ;)");
-    }
+        // Entrada de posición inicial
+        while (!posicionValida) {
 
-    public static Tipo tipo(String str1) {
-        String pieza = "";
+            tablero.limpiar();
 
-        if (str1.length() > 2) {
-            pieza = str1.substring(0, 1);
-        } else if (str1.length() == 2) {
-            pieza = str1;
+            System.out.println("Escribe la posición inicial de las piezas BLANCAS separadas por espacios:");
+            String blancas = scan.nextLine();
+
+            System.out.println("Escribe la posición inicial de las piezas NEGRAS separadas por espacios:");
+            String negras = scan.nextLine();
+
+            boolean blancasOk = pedirPiezas(tablero, blancas, Color.BLANCO);
+            boolean negrasOk = pedirPiezas(tablero, negras, Color.NEGRO);
+
+            if (!blancasOk || !negrasOk) {
+                System.out.println("Error en la entrada. Vuelve a intentarlo.\n");
+                continue;
+            }
+
+            if (!tablero.composicionMinimaValida()) {
+                System.out.println("Composición inválida: debe haber un rey blanco y uno negro.\n");
+                continue;
+            }
+
+            posicionValida = true;
         }
-        pieza = pieza.toUpperCase();
-        String valor = "";
-        switch (pieza) {
-            case "T" -> valor = "TORRE";
-            case "A" -> valor = "ALFIL";
-            case "R" -> valor = "REY";
-            case "D" -> valor = "DAMA";
-            case "C" -> valor = "CABALLO";
-            case "P" -> valor = "PEON";
-            default -> valor = "PEON";
+
+        System.out.println("Posición inicial correcta:");
+        tablero.mostrarTablero();
+
+        // Jugada
+        System.out.println("\nIntroduce la jugada (ejemplos: e2 e4  |  Cc5):");
+        String jugada = scan.nextLine().trim();
+
+        boolean exito;
+
+        if (jugada.contains(" ")) {
+            String[] partes = jugada.split(" ");
+            exito = partes.length == 2 &&
+                    tablero.mover(partes[0].toLowerCase(), partes[1].toLowerCase());
+        } else {
+            exito = moverPorTipo(tablero, jugada, Color.BLANCO);
         }
-        return Tipo.valueOf(valor);
+
+        if (!exito) {
+            System.out.println("Jugada ilegal. Pierde el bando.");
+        } else {
+            System.out.println("Tablero tras la jugada:");
+            tablero.mostrarTablero();
+        }
     }
 
-    public static void crearpieza(Tipo tipo, Color color) {
+    // ----------------------------
+    // Colocación de piezas
+    // ----------------------------
+    public static boolean pedirPiezas(Tablero tablero, String entrada, Color color) {
 
-        Pieza p1 = new Pieza(tipo, color);
-        System.out.println(p1.toString());
-    }
-    public static void pedirpiezas(String entrada, Color color) {
+        if (entrada == null || entrada.trim().isEmpty()) {
+            return true;
+        }
+
         String[] posiciones = entrada.split(" ");
 
         for (String pos : posiciones) {
+
             pos = pos.trim();
+            if (pos.length() < 2) {
+                System.out.println("Entrada inválida: " + pos);
+                return false;
+            }
 
-            char pieza = 0;
-            char columna;
-            int fila;
+            char letraPieza;
+            String casilla;
 
-            if (Character.isUpperCase(pos.charAt(0))) {
-                // Tiene pieza (ej: Cb1)
-                pieza = pos.charAt(0);
-                columna = pos.charAt(1);
-                fila = Character.getNumericValue(pos.charAt(2));
+            if (Character.isLetter(pos.charAt(0)) && Character.isUpperCase(pos.charAt(0))) {
+                letraPieza = Character.toUpperCase(pos.charAt(0));
+                casilla = pos.substring(1).toLowerCase();
             } else {
-                // No tiene pieza (ej: g3)
-                columna = pos.charAt(0);
-                fila = Character.getNumericValue(pos.charAt(1));
+                letraPieza = 'P';
+                casilla = pos.toLowerCase();
             }
 
-            switch (pieza) {
-                case 'R' -> crearpieza(Tipo.REY, color);
-                case 'D' -> crearpieza(Tipo.DAMA, color);
-                case 'T' -> crearpieza(Tipo.TORRE, color);
-                case 'C' -> crearpieza(Tipo.CABALLO, color);
-                case 'A' -> crearpieza(Tipo.ALFIL, color);
-                case '0' -> crearpieza(Tipo.PEON, color);
+            Tipo tipo = switch (letraPieza) {
+                case 'R' -> Tipo.REY;
+                case 'D' -> Tipo.DAMA;
+                case 'T' -> Tipo.TORRE;
+                case 'C' -> Tipo.CABALLO;
+                case 'A' -> Tipo.ALFIL;
+                case 'P' -> Tipo.PEON;
+                default -> null;
+            };
+
+            if (tipo == null) {
+                System.out.println("Tipo de pieza inválido: " + pos);
+                return false;
             }
 
-            System.out.println("Posición: " + pos);
-            if (pieza != 0) {
-                System.out.println("  Pieza: " + pieza);
-            } else {
-                System.out.println("  Pieza: Peón");
+            Pieza pieza = new Pieza(tipo, color);
+
+            if (!tablero.colocarPieza(pieza, casilla)) {
+                System.out.println("No se pudo colocar la pieza en: " + casilla);
+                return false;
             }
-            System.out.println("  Columna: " + columna);
-            System.out.println("  Fila: " + fila);
-            System.out.println(color);
         }
+
+        return true;
+    }
+
+    // ----------------------------
+    // Jugada tipo "Cc5" simplificada
+    // ----------------------------
+    public static boolean moverPorTipo(Tablero tablero, String jugada, Color color) {
+
+        if (jugada.length() < 3) return false;
+
+        char letra = Character.toUpperCase(jugada.charAt(0));
+        String destino = jugada.substring(1).toLowerCase();
+
+        Tipo tipo = switch (letra) {
+            case 'R' -> Tipo.REY;
+            case 'D' -> Tipo.DAMA;
+            case 'T' -> Tipo.TORRE;
+            case 'C' -> Tipo.CABALLO;
+            case 'A' -> Tipo.ALFIL;
+            default -> Tipo.PEON;
+        };
+
+        for (char col = 'a'; col <= 'h'; col++) {
+            for (int fila = 1; fila <= 8; fila++) {
+                String origen = "" + col + fila;
+                Pieza p = tablero.obtenerPieza(origen);
+
+                if (p != null && p.tipo == tipo && p.color == color) {
+                    if (tablero.mover(origen, destino)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
