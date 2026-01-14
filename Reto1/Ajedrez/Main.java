@@ -1,5 +1,6 @@
-package Ajedrez.Reto1.Ajedrez;
+package Clase.Reto1.Ajedrez;
 
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -25,9 +26,9 @@ public class Main {
                     String movimiento = scan.nextLine();
                     movimiento = movimiento.trim();
 
-                    if (color == "b"){
+                    if (Objects.equals(color, "b")){
                         tablero.mover(movimiento, Color.BLANCO);
-                    } else if (color == "n") {
+                    } else if (Objects.equals(color, "n")) {
                         tablero.mover(movimiento, Color.NEGRO);
                     }
                     tablero.mostrar();
@@ -97,3 +98,6 @@ public class Main {
         return isTrue;
     }
 }
+
+//a1, b1, c1, d1
+//Ta2, Tf2
