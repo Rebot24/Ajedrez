@@ -1,5 +1,7 @@
 package Clase.Reto1.Ajedrez;
 
+import java.util.Scanner;
+
 public class Tablero {
     static final String RESET = "\u001B[0m";
     static final String FONDO_BLANCO = "\u001B[47m";
@@ -45,13 +47,13 @@ public class Tablero {
     }
 
     public boolean mover(String pos, Color color) {
-        //Cb3 5 1
+        Scanner sc = new Scanner(System.in);
         char tipoPieza;
         int columna, fila, contador = 0, x = 0, y = 0, buscaPieza;
         Tipo tipo;
         Pieza pieza = null;
 
-        if (pos.length() < 3 || pos.length() > 4) return false;
+        if (pos.length() < 2 || pos.length() > 4) return false;
 
         if (pos.length() == 3) {
             tipoPieza = pos.charAt(0);
@@ -82,8 +84,31 @@ public class Tablero {
                 tablero[x][y] = null;
                 tablero[fila][columna] = pieza;
                 return true;
-            } else {
-                return false;
+            } else if (contador > 1) {
+                System.out.println("Hay ambigüedad al buscar la pieza que quieres mover.");
+                System.out.print("Introduce su columna: ");
+                buscaPieza =  sc.next().charAt(0) - 'a';
+
+                if (buscaPieza < 0 || buscaPieza > 7) return false;
+
+                contador = 0;
+                for (int i = 0; i < 8; i++){
+                    pieza = tablero[i][buscaPieza];
+                    if (pieza != null && pieza.color == color && pieza.tipo == tipo && comprobarMovimiento(pieza, i, buscaPieza, fila, columna) && (tablero[fila][columna] == null || tablero[fila][columna].color != color)) {
+                        contador++;
+                        x = i;
+                        y = buscaPieza;
+                    }
+                }
+
+                if (contador == 1) {
+                    pieza = tablero[x][y];
+                    tablero[x][y] = null;
+                    tablero[fila][columna] = pieza;
+                    return true;
+                } else if (contador > 1) {
+                    return false;
+                } else return false;
             }
         } else if (pos.length() == 4 && Character.isLetter(pos.charAt(1))) {
             tipoPieza = pos.charAt(0);
@@ -115,7 +140,7 @@ public class Tablero {
 
         } else if (pos.length() == 4 && Character.isDigit(pos.charAt(1))){
             tipoPieza = pos.charAt(0);
-            buscaPieza = Character.getNumericValue(pos.charAt(1)) - 1;
+            buscaPieza = 8 - Character.getNumericValue(pos.charAt(1));
             fila = 8 - Character.getNumericValue(pos.charAt(3));
             columna = pos.charAt(2) - 'a';
 
@@ -141,7 +166,30 @@ public class Tablero {
                 return true;
             } else return false;
 
-        } else return false;
+        } else if (pos.length() == 2) {
+            columna = pos.charAt(0) - 'a';
+            fila = 8 - Character.getNumericValue(pos.charAt(1));
+            tipo = Tipo.PEON;
+
+            for (int i = 1; i < 8; i++){
+                for (int j = 1; j < 8; j++){
+                    pieza = tablero[i][j];
+                    if (pieza != null && pieza.color == color && pieza.tipo == tipo && comprobarMovimiento(pieza, i, j, fila, columna) && (tablero[fila][columna] == null || tablero[fila][columna].color != color)){
+                        contador++;
+                        x = i;
+                        y = j;
+                    }
+                }
+            }
+
+            if (contador == 1) {
+                pieza = tablero[x][y];
+                tablero[x][y] = null;
+                tablero[fila][columna] = pieza;
+                return true;
+            } else return false;
+        }else return false;
+        return false;
     }
 
     private Tipo obtenerTipo(char c) {
@@ -151,8 +199,7 @@ public class Tablero {
             case 'A' -> Tipo.ALFIL;
             case 'C' -> Tipo.CABALLO;
             case 'T' -> Tipo.TORRE;
-            case 'P' -> Tipo.PEON;
-            default -> null;
+            default -> Tipo.PEON;
         };
     }
 
@@ -184,7 +231,7 @@ public class Tablero {
                 String fondo = esBlanca ? FONDO_BLANCO : FONDO_NEGRO;
 
                 if (tablero[fila][columna] == null) {
-                    System.out.print(fondo + "\u2003" + RESET);
+                    System.out.print(fondo + " " + "\u2003" + " " + RESET);
                 } else {
                     Pieza p = tablero[fila][columna];
                     char s = simbolo(p);
@@ -194,7 +241,7 @@ public class Tablero {
             }
             System.out.println();
         }
-        System.out.println("   a  b  c  d  e  f  g  h");
+        System.out.println("\u2003\u2003a \u2003b \u2003c \u2003d \u2003e \u2003f \u2003g \u2003h");
     }
 
     public void limpiar() {
