@@ -49,7 +49,7 @@ public class Tablero {
     public boolean mover(String pos, Color color) {
         Scanner sc = new Scanner(System.in);
         char tipoPieza;
-        int columna, fila, contador = 0, x = 0, y = 0, buscaPieza;
+        int columna, fila, contador = 0, x = 0, y = 0, buscaPieza, buscaPieza2;
         Tipo tipo;
         Pieza pieza = null;
 
@@ -58,9 +58,7 @@ public class Tablero {
         if (pos.length() == 3) {
             tipoPieza = pos.charAt(0);
             columna = pos.charAt(1) - 'a';
-            System.out.println(columna);
             fila = 8 - Character.getNumericValue(pos.charAt(2));
-            System.out.println(fila);
 
             if (!dentro(fila, columna)) return false;
 
@@ -78,7 +76,6 @@ public class Tablero {
                     }
                 }
             }
-
             if (contador == 1) {
                 pieza = tablero[x][y];
                 tablero[x][y] = null;
@@ -107,7 +104,19 @@ public class Tablero {
                     tablero[fila][columna] = pieza;
                     return true;
                 } else if (contador > 1) {
-                    return false;
+                    System.out.println("Sigue habiendo ambigüedad al buscar la pieza que quieres mover.");
+                    System.out.print("Introduce su fila: ");
+                    buscaPieza2 = 8 - Character.getNumericValue(sc.next().charAt(0));
+
+                    if (buscaPieza2 < 0 || buscaPieza2 > 7) return false;
+
+                    pieza = tablero[buscaPieza2][buscaPieza];
+                    if (pieza == null || pieza.tipo != tipo || pieza.color != color) return false;
+
+                    tablero[buscaPieza2][buscaPieza] = null;
+                    tablero[fila][columna] = pieza;
+                    return true;
+
                 } else return false;
             }
         } else if (pos.length() == 4 && Character.isLetter(pos.charAt(1))) {
@@ -134,6 +143,19 @@ public class Tablero {
             if (contador == 1) {
                 pieza = tablero[x][y];
                 tablero[x][y] = null;
+                tablero[fila][columna] = pieza;
+                return true;
+            } else if (contador > 1) {
+                System.out.println("Sigue habiendo ambigüedad al buscar la pieza que quieres mover.");
+                System.out.print("Introduce su fila: ");
+                buscaPieza2 = 8 - Character.getNumericValue(sc.next().charAt(0));
+
+                if (buscaPieza2 < 0 || buscaPieza2 > 7) return false;
+
+                pieza = tablero[buscaPieza2][buscaPieza];
+                if (pieza == null || pieza.tipo != tipo || pieza.color != color) return false;
+
+                tablero[buscaPieza2][buscaPieza] = null;
                 tablero[fila][columna] = pieza;
                 return true;
             } else return false;
@@ -164,6 +186,19 @@ public class Tablero {
                 tablero[x][y] = null;
                 tablero[fila][columna] = pieza;
                 return true;
+            } else if (contador > 1) {
+                System.out.println("Sigue habiendo ambigüedad al buscar la pieza que quieres mover.");
+                System.out.print("Introduce su fila: ");
+                buscaPieza2 = sc.next().charAt(0) - 'a';
+
+                if (buscaPieza2 < 0 || buscaPieza2 > 7) return false;
+
+                pieza = tablero[buscaPieza2][buscaPieza];
+                if (pieza == null || pieza.tipo != tipo || pieza.color != color) return false;
+
+                tablero[buscaPieza2][buscaPieza] = null;
+                tablero[fila][columna] = pieza;
+                return true;
             } else return false;
 
         } else if (pos.length() == 2) {
@@ -171,8 +206,8 @@ public class Tablero {
             fila = 8 - Character.getNumericValue(pos.charAt(1));
             tipo = Tipo.PEON;
 
-            for (int i = 1; i < 8; i++){
-                for (int j = 1; j < 8; j++){
+            for (int i = 0; i < 8; i++){
+                for (int j = 0; j < 8; j++){
                     pieza = tablero[i][j];
                     if (pieza != null && pieza.color == color && pieza.tipo == tipo && comprobarMovimiento(pieza, i, j, fila, columna) && (tablero[fila][columna] == null || tablero[fila][columna].color != color)){
                         contador++;
