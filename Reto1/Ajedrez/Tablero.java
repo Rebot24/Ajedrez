@@ -53,10 +53,13 @@ public class Tablero {
                     if (pieza == null || pieza.color != color || pieza.tipo != tipo) continue;
 
                     // peon usa su propio metodo
-                    boolean movimientoValido =
-                            (pieza.tipo == Tipo.PEON)
-                                    ? movimientoPeonValido(pieza, i, j, fila, columna)
-                                    : comprobarMovimiento(pieza, i, j, fila, columna);
+                    boolean movimientoValido;
+
+                    if (pieza.tipo == Tipo.PEON) {
+                        movimientoValido = movimientoPeonValido(pieza, i, j, fila, columna);
+                    } else {
+                        movimientoValido = comprobarMovimiento(pieza, i, j, fila, columna);
+                    }
 
                     if (movimientoValido &&
                             (!requiereColision(pieza.tipo) || caminoLibre(i, j, fila, columna)) && (tablero[fila][columna] == null || tablero[fila][columna].color != color)) {
@@ -83,9 +86,13 @@ public class Tablero {
                     pieza = tablero[i][buscaPieza];
                     if (pieza == null || pieza.color != color || pieza.tipo != tipo) continue;
 
-                    boolean movimientoValido = (pieza.tipo == Tipo.PEON)
-                                    ? movimientoPeonValido(pieza, i, buscaPieza, fila, columna)
-                                    : comprobarMovimiento(pieza, i, buscaPieza, fila, columna);
+                    boolean movimientoValido;
+
+                    if (pieza.tipo == Tipo.PEON) {
+                        movimientoValido = movimientoPeonValido(pieza, i, buscaPieza, fila, columna);
+                    } else {
+                        movimientoValido = comprobarMovimiento(pieza, i, buscaPieza, fila, columna);
+                    }
 
                     if (movimientoValido && (!requiereColision(pieza.tipo) || caminoLibre(i, buscaPieza, fila, columna)) && (tablero[fila][columna] == null || tablero[fila][columna].color != color)) {
 
@@ -115,7 +122,7 @@ public class Tablero {
                     pieza = tablero[i][j];
                     if (pieza == null || pieza.color != color || pieza.tipo != tipo) continue;
 
-                    // movimiento del peon 
+                    // movimiento del peon
                     if (movimientoPeonValido(pieza, i, j, fila, columna)) {
                         contador++;
                         x = i;
@@ -136,15 +143,23 @@ public class Tablero {
     // movimiento peon
     private boolean movimientoPeonValido(Pieza peon, int f1, int c1, int f2, int c2) {
 
-        int direccion = (peon.color == Color.BLANCO) ? -1 : 1;
-        int filaInicial = (peon.color == Color.BLANCO) ? 6 : 1;
+        int direccion;
+        int filaInicial;
+
+        if (peon.color == Color.BLANCO) {
+            direccion = -1;
+            filaInicial = 6;
+        } else {
+            direccion = 1;
+            filaInicial = 1;
+        }
 
         // avanza uno
         if (c1 == c2 && f2 == f1 + direccion && tablero[f2][c2] == null) {
             return true;
         }
 
-        // avanza dos 
+        // avanza dos
         if (f1 == filaInicial && c1 == c2 && f2 == f1 + 2 * direccion && tablero[f1 + direccion][c1] == null && tablero[f2][c2] == null) {
             return true;
         }
@@ -226,9 +241,15 @@ public class Tablero {
         for (int fila = 0; fila < 8; fila++) {
             System.out.print((8 - fila) + " ");
             for (int columna = 0; columna < 8; columna++) {
-
+               
                 boolean esBlanca = (fila + columna) % 2 == 0;
-                String fondo = esBlanca ? FONDO_BLANCO : FONDO_NEGRO;
+                String fondo;
+
+                if (esBlanca) {
+                    fondo = FONDO_BLANCO;
+                } else {
+                    fondo = FONDO_NEGRO;
+                }
 
                 if (tablero[fila][columna] == null) {
                     System.out.print(fondo + "   " + RESET);
@@ -271,4 +292,6 @@ public class Tablero {
             };
         }
     }
+}
+
 }
