@@ -6,55 +6,42 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        String color = "";
         Tablero tablero = new Tablero();
-        int continuar = 1;
-        do {
+
+        System.out.println("Escribe la posición inicial de las piezas blancas separadas por espacios: ");
+        String piezasBlancas = scan.nextLine();
+        if (!pedirpiezas(tablero, piezasBlancas, Color.BLANCO)) {
+            System.out.println("Error al colocar las piezas blancas.");
+            return;
+        }
+
+        System.out.println("Escribe la posición inicial de las piezas negras separadas por espacios: ");
+        String piezasNegras = scan.nextLine();
+        if (!pedirpiezas(tablero, piezasNegras, Color.NEGRO)) {
+            System.out.println("Error al colocar las piezas negras.");
+            return;
+        }
+
+        tablero.mostrar();
+
+        String colorTurno;
+        System.out.println("¿Quién empieza a mover? (b: blancas, n: negras): ");
+        colorTurno = scan.nextLine().trim().toLowerCase();
+
+        Color turno = colorTurno.equals("b") ? Color.BLANCO : Color.NEGRO;
+
+        System.out.println("Introduce tu movimiento (ej: Ch3, e3, Rd4): ");
+        String movimiento = scan.nextLine().trim();
+
+        if (tablero.mover(movimiento, turno)) {
+            tablero.promocion(turno, tablero);
+
             tablero.mostrar();
-            System.out.println("Escribe la posición inicial de las piezas blancas separadas por espacios: ");
-            String piezas = scan.nextLine();
-            if (pedirpiezas(tablero, piezas, Color.BLANCO)){
-                System.out.println("Escribe la posición inicial de las piezas negras separadas por espacios: ");
-                String piezas2 = scan.nextLine();
-                if (pedirpiezas(tablero, piezas2, Color.NEGRO)){
-                    tablero.mostrar();
+        } else {
+            System.out.println("Movimiento inválido.");
+        }
 
-                    Jaque jaque = new Jaque(tablero);
-
-                    continuar = 0;
-
-                    //si hay jaque empieza ese equipo
-                    if (jaque.hayJaque(Color.BLANCO) && jaque.hayJaque(Color.NEGRO)) {
-                        System.out.println("Ambos reyes están en jaque.");
-                        continuar = 1;
-                    } else if (jaque.hayJaque(Color.BLANCO)){
-                        System.out.println("Mueven blancas");
-                        color = "b";
-                    } else if (jaque.hayJaque(Color.NEGRO)){
-                        System.out.println("Mueven negras");
-                        color = "n";
-                    } else {
-                        System.out.println("¿Quién empieza a mover: (b, n) ");
-                        color = scan.nextLine();
-                    }
-
-                    System.out.println("Ahora dime el movimiento con este formato: (Ch3, e3, Rd4)");
-                    String movimiento = scan.nextLine();
-                    movimiento = movimiento.trim();
-
-                    if (Objects.equals(color, "b")){
-                        tablero.mover(movimiento, Color.BLANCO);
-                    } else if (Objects.equals(color, "n")) {
-                        tablero.mover(movimiento, Color.NEGRO);
-                    }
-                    tablero.mostrar();
-                }
-            }
-            tablero.limpiar();
-        } while (continuar != 0);
-
-
-        System.out.println("Gracias a Juan por su aportación!!! ;)");
+        System.out.println("Se acabó.");
     }
 
     public static boolean crearpieza(Tablero tablero, Tipo tipo, Color color, char letra, int num, boolean isTrue) {
@@ -62,57 +49,75 @@ public class Main {
 
         System.out.println(p1.toString());
 
-        if (!tablero.colocarPieza(p1, letra, num)){
+        if (!tablero.colocarPieza(p1, letra, num)) {
             System.out.println("Posición incorrecta, no se han podido colocar las piezas.");
             isTrue = false;
         }
         return isTrue;
     }
+
     public static boolean pedirpiezas(Tablero tablero, String entrada, Color color) {
-        String[] posiciones = entrada.split(" ");
-        boolean isTrue = true;
+
+        String[] posiciones = entrada.trim().split("[,\\s]+");
+
+        int peones = 0;
+        int reyes = 0;
+        int piezas = 0;
 
         for (String pos : posiciones) {
-            pos = pos.trim();
+            if (pos.isEmpty()) return false;
 
             char pieza = 0;
             char columna;
             int fila;
 
-            if (Character.isUpperCase(pos.charAt(0))) {
-                // Tiene pieza (ej: Cb1)
+            if (pos.length() != 2 && pos.length() != 3) return false;
+
+            if (pos.length() == 3) {
                 pieza = pos.charAt(0);
                 columna = pos.charAt(1);
                 fila = Character.getNumericValue(pos.charAt(2));
+
+                if (!"RDTCA".contains(String.valueOf(pieza))) return false;
             } else {
-                // No tiene pieza (ej: g3)
                 columna = pos.charAt(0);
                 fila = Character.getNumericValue(pos.charAt(1));
             }
 
-            if (isTrue) {
-                switch (pieza) {
-                    case 'R' -> isTrue = crearpieza(tablero, Tipo.REY, color, columna, fila, isTrue);
-                    case 'D' -> isTrue = crearpieza(tablero, Tipo.DAMA, color, columna, fila, isTrue);
-                    case 'T' -> isTrue = crearpieza(tablero, Tipo.TORRE, color, columna, fila, isTrue);
-                    case 'C' -> isTrue = crearpieza(tablero, Tipo.CABALLO, color, columna, fila, isTrue);
-                    case 'A' -> isTrue = crearpieza(tablero, Tipo.ALFIL, color, columna, fila, isTrue);
-                    default -> isTrue = crearpieza(tablero, Tipo.PEON, color, columna, fila, isTrue);
-                }
+            if (columna < 'a' || columna > 'h') return false;
+
+            if (fila < 1 || fila > 8) return false;
+
+            if (pieza == 0 && (fila == 1 || fila == 8)) return false;
+
+            if (pieza == 0) peones++;
+            if (pieza == 'R') reyes++;
+
+            if (peones > 8) return false;
+            if (reyes > 1) return false;
+
+            if (tablero.getPieza(fila, columna) != null) return false;
+
+            boolean creada;
+            switch (pieza) {
+                case 'R' -> creada = crearpieza(tablero, Tipo.REY, color, columna, fila, true);
+                case 'D' -> creada = crearpieza(tablero, Tipo.DAMA, color, columna, fila, true);
+                case 'T' -> creada = crearpieza(tablero, Tipo.TORRE, color, columna, fila, true);
+                case 'C' -> creada = crearpieza(tablero, Tipo.CABALLO, color, columna, fila, true);
+                case 'A' -> creada = crearpieza(tablero, Tipo.ALFIL, color, columna, fila, true);
+                default -> creada = crearpieza(tablero, Tipo.PEON, color, columna, fila, true);
             }
 
-            System.out.println("Posición: " + pos);
-            if (pieza != 0) {
-                System.out.println("  Pieza: " + pieza);
-            } else {
-                System.out.println("  Pieza: Peón");
-            }
-            System.out.println("  Columna: " + columna);
-            System.out.println("  Fila: " + fila);
-            System.out.println(color);
+            if (!creada) return false;
+
+            piezas++;
+            if (piezas > 16) return false;
         }
-        return isTrue;
+
+        return reyes == 1;
     }
+
+
 }
 
 /*

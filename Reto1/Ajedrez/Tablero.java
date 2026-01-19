@@ -24,6 +24,10 @@ public class Tablero {
         return true;
     }
 
+    public void remplazarPeon(Pieza pieza, int fila, int columna){
+        if (!dentro(fila, columna)) return;
+        tablero[fila][columna] = pieza;
+    }
 
     public boolean mover(String pos, Color color) {
 
@@ -52,7 +56,6 @@ public class Tablero {
                     pieza = tablero[i][j];
                     if (pieza == null || pieza.color != color || pieza.tipo != tipo) continue;
 
-                    // peon usa su propio metodo
                     boolean movimientoValido;
 
                     if (pieza.tipo == Tipo.PEON) {
@@ -136,7 +139,6 @@ public class Tablero {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -171,6 +173,57 @@ public class Tablero {
 
         return false;
     }
+
+    public boolean promocion(Color color, Tablero tablero) {
+        Scanner sc = new Scanner(System.in);
+        Pieza pieza;
+        char eleccion;
+        int fila = -1, col = -1;
+        Tipo tipo;
+
+        if (color == Color.BLANCO) {
+            for (int i = 0; i < 8; i++) {
+                pieza = tablero.getPieza(0, i);
+                if (pieza != null && pieza.tipo == Tipo.PEON && pieza.color == Color.BLANCO) {
+                    System.out.println("¿En qué pieza quieres transformar tu peón? (A: Alfil, D: Dama, T: Torre, C: Caballo)");
+                    eleccion = Character.toUpperCase(sc.nextLine().charAt(0));
+                    fila = 0;
+                    col = i;
+                    tipo = obtenerTipo(eleccion);
+
+                    if (tipo == Tipo.PEON || tipo == Tipo.REY) {
+                        System.out.println("Elección inválida. Solo puedes elegir Alfil, Dama, Torre o Caballo.");
+                        return false;
+                    }
+
+                    tablero.remplazarPeon(new Pieza(tipo, color), fila, col);
+                    System.out.println("Peón promocionado a " + tipo);
+                }
+            }
+        } else {
+            for (int i = 0; i < 8; i++) {
+                pieza = tablero.getPieza(7, i);
+                if (pieza != null && pieza.tipo == Tipo.PEON && pieza.color == Color.NEGRO) {
+                    System.out.println("¿En qué pieza quieres transformar tu peón? (A: Alfil, D: Dama, T: Torre, C: Caballo)");
+                    eleccion = Character.toUpperCase(sc.nextLine().charAt(0));
+                    fila = 7;
+                    col = i;
+                    tipo = obtenerTipo(eleccion);
+
+                    if (tipo == Tipo.PEON || tipo == Tipo.REY) {
+                        System.out.println("Elección inválida. Solo puedes elegir Alfil, Dama, Torre o Caballo.");
+                        return false;
+                    }
+
+                    tablero.remplazarPeon(new Pieza(tipo, color), fila, col);
+                    System.out.println("Peón promocionado a " + tipo);
+                }
+            }
+        }
+
+        return true;
+    }
+
 
 
     public boolean comprobarMovimiento(Pieza pieza, int f1, int c1, int f2, int c2) {
