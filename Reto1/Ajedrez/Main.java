@@ -6,9 +6,11 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
+        String color = "";
         Tablero tablero = new Tablero();
         int continuar = 1;
         do {
+            tablero.mostrar();
             System.out.println("Escribe la posición inicial de las piezas blancas separadas por espacios: ");
             String piezas = scan.nextLine();
             if (pedirpiezas(tablero, piezas, Color.BLANCO)){
@@ -16,11 +18,25 @@ public class Main {
                 String piezas2 = scan.nextLine();
                 if (pedirpiezas(tablero, piezas2, Color.NEGRO)){
                     tablero.mostrar();
+
+                    Jaque jaque = new Jaque(tablero);
+
                     continuar = 0;
 
                     //si hay jaque empieza ese equipo
-                    System.out.println("¿Quién empieza a mover: (b, n) ");
-                    String color = scan.nextLine();
+                    if (jaque.hayJaque(Color.BLANCO) && jaque.hayJaque(Color.NEGRO)) {
+                        System.out.println("Ambos reyes están en jaque.");
+                        continuar = 1;
+                    } else if (jaque.hayJaque(Color.BLANCO)){
+                        System.out.println("Mueven blancas");
+                        color = "b";
+                    } else if (jaque.hayJaque(Color.NEGRO)){
+                        System.out.println("Mueven negras");
+                        color = "n";
+                    } else {
+                        System.out.println("¿Quién empieza a mover: (b, n) ");
+                        color = scan.nextLine();
+                    }
 
                     System.out.println("Ahora dime el movimiento con este formato: (Ch3, e3, Rd4)");
                     String movimiento = scan.nextLine();
@@ -99,5 +115,7 @@ public class Main {
     }
 }
 
-//a1, b1, c1, d1
-//Ta2, Tf2
+/*
+Cb1, a2, b2, c2, d2, e2, f2, g2, h2, Re1, Dd1, Ta1, Th1, Cg1, Ac1, Af1
+Cb8, a7, b7, c7, d7, e7, f7, g7, h7, Re8, Dd8, Ta8, Th8, Cg8, Ac8, Af8
+*/
