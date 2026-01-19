@@ -1,28 +1,36 @@
 public class jaque {
 
-    public boolean HayJaqueB(boolean reyBlanco) {
-        int reyfila = -1;
-        int reycol = -1;
+    public boolean hayJaque(Pieza[][] tablero, boolean reyBlanco) {
+        int reyFila = -1;
+        int reyCol = -1;
 
-        // esto es basicamente para encontrar donde esta el rey
+        // Buscar la posición del rey
         for (int f = 0; f < 8; f++) {
             for (int c = 0; c < 8; c++) {
-                if (tablero[f][c] instanceof Rey && tablero[f][c].esBlanca() == reyBlanco) {
-                    reyfila = f;
-                    reycol = c;
+                if (tablero[f][c] instanceof Rey &&
+                        tablero[f][c].esBlanca() == reyBlanco) {
+
+                    reyFila = f;
+                    reyCol = c;
                     break;
                 }
             }
+            if (reyFila != -1) break;
         }
 
-        // y esto para el jaque, que basicamente se busca que pieza del tablero esta en posicion de atacar al rey
+        // Si no se encuentra el rey
+        if (reyFila == -1) {
+            return false;
+        }
+
+        // Comprobar si alguna pieza enemiga puede atacar al rey
         for (int f = 0; f < 8; f++) {
             for (int c = 0; c < 8; c++) {
                 if (tablero[f][c] != null &&
                         tablero[f][c].esBlanca() != reyBlanco) {
 
                     if (tablero[f][c].puedeAtacar(
-                            f, c, reyfila, reycol, tablero)) {
+                            f, c, reyFila, reyCol, tablero)) {
                         return true;
                     }
                 }
@@ -30,37 +38,4 @@ public class jaque {
         }
         return false;
     }
-
-    public boolean HayjaqueN(boolean reyNegro){
-        int reyfila = -1;
-        int reycol = -1;
-
-        //lo mismo pero en el rey negro
-        for (int f = 0; f < 8; f++) {
-            for (int c = 0; c < 8; c++) {
-                if(tablero[f][c] instanceof Rey && tablero[f][c].esBlanca() == false){
-                    reyfila = 1;
-                    reycol = 1;
-                    break;
-                }
-
-            }
-        }
-
-        //y otra vez lo mismo
-        for (int f = 0; f < 8; f++) {
-            for (int c = 0; c < 8; c++) {
-                if (tablero[f][c] != null &&
-                        tablero[f][c].esBlanca() == true) {
-
-                    if (tablero[f][c].puedeAtacar(
-                            f, c, reyfila, reycol, tablero)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
 }
