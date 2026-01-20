@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         Tablero tablero = new Tablero();
+        Jaque jaque = new Jaque(tablero);
 
         System.out.println("Escribe la posición inicial de las piezas blancas separadas por espacios: ");
         String piezasBlancas = scan.nextLine();
@@ -24,24 +25,36 @@ public class Main {
 
         tablero.mostrar();
 
-        String colorTurno;
-        System.out.println("¿Quién empieza a mover? (b: blancas, n: negras): ");
-        colorTurno = scan.nextLine().trim().toLowerCase();
+        String colorTurno = "";
 
-        Color turno = colorTurno.equals("b") ? Color.BLANCO : Color.NEGRO;
-
-        System.out.println("Introduce tu movimiento (ej: Ch3, e3, Rd4): ");
-        String movimiento = scan.nextLine().trim();
-
-        if (tablero.mover(movimiento, turno)) {
-            tablero.promocion(turno, tablero);
-
-            tablero.mostrar();
+        if (jaque.hayJaque(Color.BLANCO) && jaque.hayJaque(Color.NEGRO)) {
+            System.out.println("Posición ilegal: dos reyes en jaque.");
+        } else if (jaque.hayJaque(Color.NEGRO)) {
+            colorTurno = "n";
+            System.out.println("Jaque a las NEGRAS. Deben mover ellas.");
+        } else if (jaque.hayJaque(Color.BLANCO)){
+            colorTurno = "b";
+            System.out.println("Jaque a las BLANCAS. Deben mover ellas.");
         } else {
-            System.out.println("Movimiento inválido.");
+            System.out.println("¿Quién empieza a mover? (b: blancas, n: negras): ");
+            colorTurno = scan.nextLine().trim().toLowerCase();
         }
 
-        System.out.println("Se acabó.");
+        if (!colorTurno.isEmpty()){
+            Color turno = colorTurno.equals("b") ? Color.BLANCO : Color.NEGRO;
+            System.out.println("Introduce tu movimiento (ej: Ch3, e3, Rd4): ");
+            String movimiento = scan.nextLine().trim();
+
+            if (tablero.mover(movimiento, turno)) {
+                tablero.promocion(turno, tablero);
+
+                tablero.mostrar();
+            } else {
+                System.out.println("Movimiento inválido.");
+            }
+
+            System.out.println("Se acabó.");
+        }
     }
 
     public static boolean crearpieza(Tablero tablero, Tipo tipo, Color color, char letra, int num, boolean isTrue) {

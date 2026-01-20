@@ -24,7 +24,7 @@ public class Tablero {
         return true;
     }
 
-    public void remplazarPeon(Pieza pieza, int fila, int columna){
+    public void remplazarPeon(Pieza pieza, int fila, int columna) {
         if (!dentro(fila, columna)) return;
         tablero[fila][columna] = pieza;
     }
@@ -220,11 +220,8 @@ public class Tablero {
                 }
             }
         }
-
         return true;
     }
-
-
 
     public boolean comprobarMovimiento(Pieza pieza, int f1, int c1, int f2, int c2) {
 
@@ -242,7 +239,6 @@ public class Tablero {
             default -> false;
         };
     }
-
 
     private boolean requiereColision(Tipo tipo) {
         return tipo == Tipo.TORRE || tipo == Tipo.ALFIL || tipo == Tipo.DAMA;
@@ -263,7 +259,6 @@ public class Tablero {
         }
         return true;
     }
-
 
     private void moverPieza(int f1, int c1, int f2, int c2) {
         Pieza p = tablero[f1][c1];
@@ -317,16 +312,14 @@ public class Tablero {
         System.out.println("   a b c d e f g h");
     }
 
-
     public void limpiar() {
         for (int f = 0; f < 8; f++)
             for (int c = 0; c < 8; c++)
                 tablero[f][c] = null;
     }
 
-
     private char simbolo(Pieza p) {
-        if (p.color == Color.BLANCO){
+        if (p.color == Color.BLANCO) {
             return switch (p.tipo) {
                 case REY -> simboloPiezas.REY_BLANCO;
                 case DAMA -> simboloPiezas.DAMA_BLANCA;
